@@ -1,3 +1,3 @@
-import Header from './header';
+import ItemList from './item-list';
 
-export default Header;
+export default ItemList;
