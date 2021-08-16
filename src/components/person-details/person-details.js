@@ -7,7 +7,9 @@ export default class PersonDetails extends Component {
 
   swapiService = new SwapiService();
   state = {
-    person: {}
+    person: {},
+    loading: false,
+    noOneWasChosenYet: true
   }
   componentDidMount() {
     this.updatePerson();
@@ -15,10 +17,17 @@ export default class PersonDetails extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.personId !== prevProps.personId) {
+      this.preUpdatePerson();
       this.updatePerson();
     }
   }
 
+  onPersonLoaded = (person) => {
+    this.setState({person, loading: false, noOneWasChosenYet: false});
+  }
+  preUpdatePerson(){
+    this.setState({loading: true});
+  }
   updatePerson() {
     const { personId } = this.props;
     if (!personId) {
@@ -27,16 +36,17 @@ export default class PersonDetails extends Component {
 
     this.swapiService
       .getPerson(personId)
-      .then((person) => {
-        this.setState({ person });
-      });
+      .then(this.onPersonLoaded);
+    
+    
   }
   render() {
-    const {personId} = this.props;
-    console.log("Selected person:", personId);
-
-    if (!personId){
-      return (<Spinner />);
+    const {noOneWasChosenYet, loading} = this.state;
+    if(loading){
+      return (<Spinner />)
+    }
+    if(noOneWasChosenYet){
+      return(<span>No one was chosen yet</span>)
     }
     const {id, name, birthYear, gender, eyeColor} = this.state.person;
     return (
